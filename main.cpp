@@ -62,17 +62,76 @@ void drowBoard(char board[3][3]) {
     }
 }
 
+int minimax(char board[3][3], int depth, bool isMaximizing, bool firstTime = true) {
+    int result = checkWiner(board);
+    if(depth == 0 || result != 1) {
+        return result;
+    }
+
+    if(isMaximizing) {
+        int finalScore = -10;
+        int finalI, finalJ;
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                if(board[i][j] == ' ') {
+                    board[i][j] = 'X';
+                    int score = minimax(board, depth - 1, false, false);
+                    board[i][j] = ' ';
+                    if(score > finalScore) {
+                        finalScore = score;
+                        finalI = i;
+                        finalJ = j;
+                    }
+                    if(firstTime) {
+                        cout << "score," << i << "," << j << ": " << score << "\n";
+                    }
+                }
+            }   
+        }
+        if(firstTime) {
+            board[finalI][finalJ] = 'O';
+        }
+        return finalScore;
+    } else {
+        int finalScore = 10;
+        int finalI, finalJ;
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 3; j++) {
+                if(board[i][j] == ' ') {
+                    board[i][j] = 'O';
+                    int score = minimax(board, depth - 1, true, false);
+                    board[i][j] = ' ';
+                    if(score < finalScore) {
+                        finalScore = score;
+                        finalI = i;
+                        finalJ = j;
+                    }
+                    if(firstTime) {
+                        cout << "score," << i << "," << j << ": " << score << "\n";
+                    }
+                }
+            }   
+        }
+        if(firstTime) {
+            board[finalI][finalJ] = 'O';
+        }
+        return finalScore;
+    }
+}
+
 int main() {
     char board[3][3] = { {' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '} };
-    int x, y;
+    int x, y; // 0, 1, 2
     bool has_winer = false;
     char player = 'X';
     while(!has_winer) {
         cin >> x >> y;
         if(board[x][y] == ' ') {
             board[x][y] = player;
-            player == 'X' ? player = 'O' : player = 'X';
+            // player == 'X' ? player = 'O' : player = 'X';
+            int result = minimax(board, 100, false);
             drowBoard(board);
+            cout << "result: " << result << "\n";
             has_winer = checkWiner(board) != 1;
         } else {
             cout << "The field is not empty \n";
